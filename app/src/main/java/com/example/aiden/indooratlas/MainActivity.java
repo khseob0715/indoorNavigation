@@ -20,7 +20,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
 
-    private GoogleMap mMap;
+    public GoogleMap mMap;
     private MapView mapView = null;
 
     private final int PERMISSIONS_ACCESS_FINE_LOCATION = 1000;
@@ -43,24 +43,23 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         gps = new GpsInfo(MainActivity.this);
 
         if(gps.isGetLocation()){
-            latitude = gps.getLatitude();
-            longitude = gps.getLongitude();
+//            latitude = gps.getLatitude();
+//            longitude = gps.getLongitude();
+            latitude = gps.lat;
+            longitude = gps.lon;
         }else {
             gps.showSettingAlert();
         }
 
+
         mapView = (MapView)findViewById(R.id.mapView);
         mapView.onCreate(savedInstanceState);
         mapView.getMapAsync(this);
-
-        Log.e("tab","sssss");
-
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        Log.e("tab","ssssssssssss");
         mapView.onResume();
     }
 
@@ -69,10 +68,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mMap = googleMap;
 
         // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(latitude, longitude);
-        //mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(sydney, 17));
+        LatLng mylocation = new LatLng(latitude, longitude);
+        mMap.addMarker(new MarkerOptions().position(mylocation).title("My Location"));
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(mylocation));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mylocation, 17));
     }
 
     @Override
@@ -106,6 +105,19 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }else{
             isPermission = true;
         }
+    }
+
+    public void ShowMyLocation(double lat, double lon, GoogleMap googleMap){
+        LatLng nowLocation = new LatLng(lat, lon);
+        MarkerOptions markerOptions = new MarkerOptions();
+        markerOptions.position(nowLocation);
+        markerOptions.title("now location");
+
+        googleMap.clear();
+
+        googleMap.addMarker(markerOptions);
+        googleMap.moveCamera(CameraUpdateFactory.newLatLng(nowLocation));;
+        googleMap.animateCamera(CameraUpdateFactory.zoomTo(17));
     }
 
 }

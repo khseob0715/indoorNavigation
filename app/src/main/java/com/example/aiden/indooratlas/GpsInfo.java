@@ -28,13 +28,15 @@ public class GpsInfo extends Service implements LocationListener{
     // GPS 상태 값
     boolean isGetLocation = false;
 
-    Location location;
-    double lat, lon;
+    public Location location;
+    public double lat, lon;
 
     // 최소 GPS 정보 업데이트 거리 10 미터
     private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 10;
     // 최소 GPS 정보 업데이트 시간, 밀리세컨드이므로 1분.
     private static final long MIN_TIME_BW_UPDATES = 1000 * 60 * 1;
+
+    private MainActivity mainActivity;
 
     protected LocationManager locationManager;
     public GpsInfo(Context mContext) {
@@ -160,7 +162,11 @@ public class GpsInfo extends Service implements LocationListener{
 
     @Override
     public void onLocationChanged(Location location) {
-
+        lat = location.getLatitude();
+        lon = location.getLongitude();
+        if (mainActivity.mMap != null) {
+            mainActivity.ShowMyLocation(lat, lon, mainActivity.mMap);
+        }
     }
 
     @Override
