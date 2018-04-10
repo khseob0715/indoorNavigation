@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="building">
+        <item>본관</item>
+        <item>IT 융합대학</item>
+        <item>경상대학</item>
+    </string-array>
+    <string-array name="building01">
+        <item>교무처 교직운영팀</item>
+        <item>산학협력단 산학협력팀</item>
+        <item>산학협력단 교무처</item>
+    </string-array>
+</resources>

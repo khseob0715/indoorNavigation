@@ -1,6 +1,7 @@
 package com.example.aiden.indooratlas;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -9,6 +10,10 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -37,6 +42,27 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        Spinner building = (Spinner)findViewById(R.id.BuildingSpinner);
+
+        ArrayAdapter<String> buildingAdapter  = new ArrayAdapter<String>(this,
+                R.layout.support_simple_spinner_dropdown_item,
+                (String[])getResources().getStringArray(R.array.building));
+        buildingAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        building.setAdapter(buildingAdapter);
+
+        building.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
         if(!isPermission){
             callPermission();
         }
@@ -50,7 +76,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }else {
             gps.showSettingAlert();
         }
-
 
         mapView = (MapView)findViewById(R.id.mapView);
         mapView.onCreate(savedInstanceState);
