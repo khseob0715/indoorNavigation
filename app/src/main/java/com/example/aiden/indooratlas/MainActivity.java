@@ -5,8 +5,12 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Build;
+import android.os.Debug;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -23,7 +27,9 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
+import static android.location.LocationManager.GPS_PROVIDER;
+
+public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, View.OnClickListener {
 
     public GoogleMap mMap;
     private MapView mapView = null;
@@ -78,8 +84,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
 
         mapView = (MapView)findViewById(R.id.mapView);
-        mapView.onCreate(savedInstanceState);
         mapView.getMapAsync(this);
+        if(mapView != null) {
+            mapView.onCreate(savedInstanceState);
+        }
     }
 
     @Override
@@ -91,12 +99,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-
+        Log.e("error", String.valueOf(mMap));
         // Add a marker in Sydney and move the camera
         LatLng mylocation = new LatLng(latitude, longitude);
         mMap.addMarker(new MarkerOptions().position(mylocation).title("My Location"));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(mylocation));
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mylocation, 17));
+        ShowMyLocation(latitude,longitude,mMap);
+        StartLocationService();
     }
 
     @Override
@@ -132,6 +142,37 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()){
+            case R.id.SearchLoad:
+                break;
+        }
+    }
+
+    private class GPSListener implements LocationListener {
+        @Override
+        public void onLocationChanged(Location location) {
+            latitude = location.getLatitude();
+            longitude = location.getLongitude();
+            //String msg = "Lat:" + lat + " / Lon:" + lon;
+            ShowMyLocation(latitude, longitude, mMap);
+        }
+
+        @Override
+        public void onStatusChanged(String s, int i, Bundle bundle) {
+        }
+
+        @Override
+        public void onProviderEnabled(String s) {
+            ShowMyLocation(latitude, longitude, mMap);
+        }
+
+        @Override
+        public void onProviderDisabled(String s) {
+        }
+    }
+
     public void ShowMyLocation(double lat, double lon, GoogleMap googleMap){
         LatLng nowLocation = new LatLng(lat, lon);
         MarkerOptions markerOptions = new MarkerOptions();
@@ -145,4 +186,36 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         googleMap.animateCamera(CameraUpdateFactory.zoomTo(17));
     }
 
+    private void StartLocationService() {
+        LocationManager manager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
+        GpsInfo gpsListener = new GpsInfo(MainActivity.this);
+        long minTime = 10000;
+        float minDistance = 0;
+        try {   //GPS 위치 요청
+            if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                // TODO: Consider calling
+                //    ActivityCompat#requestPermissions
+                // here to request the missing permissions, and then overriding
+                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                //                                          int[] grantResults)
+                // to handle the case where the user grants the permission. See the documentation
+                // for ActivityCompat#requestPermissions for more details.
+                return;
+            }
+            manager.requestLocationUpdates(GPS_PROVIDER, minTime, minDistance, (LocationListener) gpsListener);
+
+            // location request with network
+            manager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, minTime, minDistance, (LocationListener) gpsListener);
+
+            Location lastLocation = manager.getLastKnownLocation(GPS_PROVIDER);
+
+            if (lastLocation != null) {
+                Double latitude = lastLocation.getLatitude();
+                Double longitude = lastLocation.getLongitude();
+
+            }
+        } catch (SecurityException e) {
+            e.printStackTrace();
+        }
+    }
 }

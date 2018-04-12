@@ -39,6 +39,8 @@ public class GpsInfo extends Service implements LocationListener{
     private MainActivity mainActivity;
 
     protected LocationManager locationManager;
+
+
     public GpsInfo(Context mContext) {
         this.mContext = mContext;
         getLocation();
@@ -164,9 +166,9 @@ public class GpsInfo extends Service implements LocationListener{
     public void onLocationChanged(Location location) {
         lat = location.getLatitude();
         lon = location.getLongitude();
-        if (mainActivity.mMap != null) {
-            mainActivity.ShowMyLocation(lat, lon, mainActivity.mMap);
-        }
+//        if (mainActivity.mMap != null) {
+//            mainActivity.ShowMyLocation(lat, lon, mainActivity.mMap);
+//        }
     }
 
     @Override
